@@ -7,7 +7,7 @@ from model.Obstacles import Obstacles
 from model.Player import Player
 from service.GameState import GameState
 from view.GameOver import GameOver
-from view.StartMenu import StartMenu
+from view.StartMenuTkinter import StartMenuTkinter
 
 class Gameplay:
     """
@@ -25,10 +25,15 @@ class Gameplay:
         player_1: Instância do jogador.
     """
 
-    def __init__(self):
+    def __init__(self, window):
         self.game_state = GameState()
         self.game_state.open()
-        self.start_menu = StartMenu(self.game_state)
+
+        self.start_menu = StartMenuTkinter(
+            self.game_state,
+            window,
+            self.start_game
+        )
         self.enemies_killed = 0
         self.initial_number_of_enemies = self.game_state.get_enemy_start()
         self.game_state.set_enemy_quantity(self.initial_number_of_enemies)
@@ -284,3 +289,8 @@ class Gameplay:
                     self.game_state.set_enemy_quantity(enemy_quantity - 1)
         
         self.game_state.set_killed_enemies(self.enemies_killed)
+
+    def start_game(self):
+        print("START_GAME FOI CHAMADO")
+        self.game_loop()    
+        
