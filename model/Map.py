@@ -26,6 +26,7 @@ class Map:
 
     def __init__(self, game_state):
         self.game_state = game_state
+        self.renderer = None
         self.matrix = None
         self.size = 12
         self.player_row, self.player_col = Player.spawn_position
@@ -84,7 +85,7 @@ class Map:
             
     def update_cell(self, row, col, symbol):
         if self.is_index_valid(row, col):
-            self.matrix[row][col] = symbol
+            self.renderer.draw(row, col, symbol)
         else:
             print(f"Tentativa de atualizar célula inválida: ({row},{col})")
             
@@ -103,8 +104,6 @@ class Map:
                 
             original_cells[(row, col)] = cell
             self.update_cell(row, col, "*")
-
-        self.print_map()
 
         hit_enemies = []
         player_hit = False
@@ -127,7 +126,6 @@ class Map:
 
         return hit_enemies, player_hit
     
-    def print_map(self):
-        for row in self.matrix:
-            print(self.EMPTY.join(row))
+    def set_renderer(self, renderer):
+        self.renderer = renderer
         
