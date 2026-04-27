@@ -1,5 +1,3 @@
-import os
-
 PLAYER_SYMBOL = "P"
 ENEMY_SYMBOL = "E"
 BOMB_SYMBOL = "B"
