@@ -7,18 +7,15 @@ class StartMenuTkinter:
         self.window = window
         self.game_state = game_state
         self.start_game = start_game
-        self.BASE_DIR = Path.cwd() / "assets"
+        self.BASE_DIR = Path.cwd() / "assets" / "StartMenu"
+        self.canvas = Canvas(self.window)
+        self.canvas.pack(fill="both", expand=True)
         self.show_welcome()
 
     def show_welcome(self):
         
         self.background_path = self.BASE_DIR / "startMenu_bg.png"
-        self.background_image = PhotoImage(file=self.background_path)
-
-        self.canvas = Canvas(self.window)
-        self.canvas.pack(fill="both", expand=True)
-
-       
+        self.background_image = PhotoImage(file=self.background_path).subsample(4,4)
 
         self.canvas.create_image(0, 0, image=self.background_image, anchor=NW)
 
@@ -92,14 +89,20 @@ class StartMenuTkinter:
                 fill="#ecce32"
             )
 
-            self.play_button_path = self.BASE_DIR / "play_button.png"
-            self.play_button_image = PhotoImage(file=self.play_button_path)
-
-            self.canvas.create_image(400, 680, image=self.play_button_image, tags="play")
-            # canvas.tag_bind("play", "<Button-1>", self.on_play_click)
+            self.play_button()
 
         else:
             self.canvas.create_text(400,400,text="\nPrimeira partida! Boa sorte.\n", font=("Arial",40), fill="white")
+            self.play_button()
     
     def on_play_click(self, event=None):
+        self.canvas.destroy()
         self.start_game()
+
+    def play_button(self):
+        self.play_button_path = self.BASE_DIR / "play_button.png"
+        self.play_button_image = PhotoImage(file=self.play_button_path).subsample(5,5)
+        
+        self.button = self.canvas.create_image(400, 680, image=self.play_button_image, tags="play")
+        self.canvas.tag_bind(self.button, "<Button-1>", self.on_play_click)
+        
