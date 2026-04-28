@@ -1,3 +1,5 @@
+import sys
+import os
 import random
 from tkinter import *
 from model.Enemy import Enemy
@@ -29,7 +31,17 @@ class Gameplay:
         self.window = window
         self.game_state = GameState()
         self.game_state.open()
- 
+
+        self.binds = {
+            "move_up": self.window.bind("<w>",lambda event: self.player_1.move('w', self.start_game_map)),
+            "move_down": self.window.bind("<s>",lambda event: self.player_1.move('s', self.start_game_map)),
+            "move_left": self.window.bind("<a>",lambda event: self.player_1.move('a', self.start_game_map)),
+            "move_right": self.window.bind("<d>",lambda event: self.player_1.move('d', self.start_game_map)),
+            "quit": self.window.bind("<q>", lambda event: self.close_game()),
+            "put_bomb": self.window.bind("<f>",lambda event: self.player_1.put_bomb('f', self.start_game_map)),
+            "move_up": self.window.bind("<w>",lambda event: self.player_1.move('w', self.start_game_map))
+        }
+
         self.start_menu = StartMenuTkinter(
             self.game_state,
             window,
@@ -45,6 +57,10 @@ class Gameplay:
         self.canvas = None
         self.renderer = None
 
+        # lower_diff = Canvas.create_rectangle(self.canvas)
+        lower_diff = Button(self.window, text="Abaixar Dificuldade", command=self.lower_difficulty)
+        lower_diff.pack()
+
     def setup_map(self):
         """Inicializa o mapa, canvas e renderer."""
         self.start_game_map = Map(self.game_state)
@@ -52,7 +68,7 @@ class Gameplay:
         self.free_positions = self.start_game_map.get_free_positions()
 
         size = self.start_game_map.size * 48
-        self.canvas = Canvas(self.window, width=size, height=size)
+        self.canvas = Canvas(self.window, width=size, height=size, bg="#653c08")
         self.canvas.pack()
         self.renderer = MapRendererTkinter(self.canvas)
         self.start_game_map.set_renderer(self.renderer)
@@ -67,22 +83,7 @@ class Gameplay:
 
 
     def game_loop(self):
-        self.binds = {
-            "move_up": self.window.bind("<w>",lambda event: self.player_1.move('w', self.start_game_map)),
-            "move_down": self.window.bind("<s>",lambda event: self.player_1.move('s', self.start_game_map)),
-            "move_left": self.window.bind("<a>",lambda event: self.player_1.move('a', self.start_game_map)),
-            "move_right": self.window.bind("<d>",lambda event: self.player_1.move('d', self.start_game_map)),
-            "quit": self.window.bind("<q>", lambda event: self.close_game()),
-            "put_bomb": self.window.bind("<f>",lambda event: self.player_1.put_bomb('f', self.start_game_map)),
-            "move_up": self.window.bind("<w>",lambda event: self.player_1.move('w', self.start_game_map))
-        }
-
-        self.update_bombs()
-        self.update_enemies()
-
-        # while self.player_1.is_alive() and self.game_state.get_game_over_cause() == "None":
-
-            # print(f"Movimento: w/a/s/d        "
+        # print(f"Movimento: w/a/s/d        "
             #       f"Colocar bomba: f        "
             #       f"Sair: q        "
             #       f"Bombas utilizadas: {self.game_state.get_bombs_utilized()}        "
@@ -90,38 +91,40 @@ class Gameplay:
             #       f"Turnos sobrevividos: {self.game_state.get_survived_turns()}        "
             #       f"Turno maximo: {self.game_state.get_maximum_turn()}\n"
             #       f"Dificuldade atual: {self.game_state.get_difficulty()}   "
-            #       f"Abaixar dificuldade: Digite facil      "
             #       f"Inimigos mortos: {self.enemies_killed}       "
             #       )
 
-        lower_diff = Button(self.window, text="Abaixar Dificuldade")
-        lower_diff.pack()
+        if self.player_1.is_alive() and self.game_state.get_game_over_cause() == "None":
 
-            # if command == "facil":
-            #     self.lower_difficulty_to_easy()
-            #     self.game_state.save()
-            #     print("")
-            #     print("Dificuldade alterada para fácil. Reiniciando o jogo...\n")
-            #     break
+            if self.player_1.moved:
+                self.update_bombs()
+                self.create_dynamic_enemies()
+                self.update_enemies()
+
+                self.renderer.render(self.start_game_map.matrix)
+                self.player_1.moved = False
             
-            
+            self.window.after(100, self.game_loop)
 
-            # if self.game_state.get_survived_turns() % 5 == 0:
-            #     self.create_dynamic_enemies()
-
-            # if not self.player_1.is_alive():
-            #     self.update_rounds_played()
-            #     self.game_state.save()
-            #     break
-
-            # if self.game_state.get_survived_turns() >= self.game_state.get_maximum_turn():
-            #     self.update_rounds_played()
-            #     self.update_rounds_survived()
-            #     self.update_difficulty()
+            if not self.player_1.is_alive():
+                self.update_rounds_played()
+                self.game_state.save()
                 
-            #     self.player_survived()
-            #     self.game_state.save()  
-            #     break
+            if self.game_state.get_survived_turns() >= self.game_state.get_maximum_turn():
+                self.update_rounds_played()
+                self.update_rounds_survived()
+                self.update_difficulty()
+                    
+                self.player_survived()
+                self.game_state.save() 
+            
+    def lower_difficulty(self):
+        self.lower_difficulty_to_easy()
+        self.game_state.save()
+                # print("")
+                # print("Dificuldade alterada para fácil. Reiniciando o jogo...\n")
+        self.close_game()
+        os.execl(sys.executable, sys.executable, *sys.argv)
 
     def close_game(self):
         self.window.destroy()
@@ -133,28 +136,30 @@ class Gameplay:
             enemy = Enemy(free_position)
             self.enemies.append(enemy)
             row, col = free_position
+            self.start_game_map.matrix[row][col] = enemy.SYMBOL
             self.start_game_map.update_cell(row, col, enemy.SYMBOL)
 
         self.renderer.render(self.start_game_map.matrix)
         
     def create_dynamic_enemies(self):
-        self.update_enemy_spawn_frequency()
-        enemies_spawned = []
+        if self.game_state.get_survived_turns() % 5 == 0:
+            self.update_enemy_spawn_frequency()
+            enemies_spawned = []
 
-        enemies_to_spawn = self.game_state.get_enemy_spawn_frequency()
-        for _ in range(enemies_to_spawn):
-            free_position = random.choice(self.free_positions)
-            self.free_positions.remove(free_position)
-            enemy = Enemy(free_position)
-            enemies_spawned.append(enemy)
-            self.enemies.append(enemy)
-            row, col = free_position
-            self.start_game_map.update_cell(row, col, enemy.SYMBOL)
-        
-        enemies_quantity = self.game_state.get_enemy_quantity()
-        self.game_state.set_enemy_quantity(enemies_quantity + len(enemies_spawned))
+            enemies_to_spawn = self.game_state.get_enemy_spawn_frequency()
+            for _ in range(enemies_to_spawn):
+                free_position = random.choice(self.free_positions)
+                self.free_positions.remove(free_position)
+                enemy = Enemy(free_position)
+                enemies_spawned.append(enemy)
+                self.enemies.append(enemy)
+                row, col = free_position
+                self.start_game_map.update_cell(row, col, enemy.SYMBOL)
+            
+            enemies_quantity = self.game_state.get_enemy_quantity()
+            self.game_state.set_enemy_quantity(enemies_quantity + len(enemies_spawned))
 
-        self.renderer.render(self.start_game_map.matrix)
+            self.renderer.render(self.start_game_map.matrix)
 
     def update_rounds_played(self):
         rounds_played = self.game_state.get_rounds_played()
@@ -178,7 +183,6 @@ class Gameplay:
         self.update_initial_enemies()
         self.update_maximum_turn_limit()
 
-        
     def lower_difficulty_to_easy(self):
         self.game_state.set_rounds_survived(0)
         self.game_state.set_difficulty("easy")
