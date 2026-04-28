@@ -13,16 +13,17 @@ class MapRendererTkinter:
         def load_image(image_name):
             img = Image.open(self.BASE_DIR / image_name)
             
-            img = img.resize((self.tile_size, self.tile_size), Image.Resampling.NEAREST)
+            img = img.resize((self.tile_size, self.tile_size), Image.Resampling.LANCZOS)
             return ImageTk.PhotoImage(img)
-
+        
         self.images = {
             "!": load_image("floor.png"),
             "#": load_image("wall.png"),
             "+": load_image("breakable.png"),
             "P": load_image("player.png"),
             "E": load_image("enemy.png"),
-            "B": load_image("bomb.png")
+            "B": load_image("bomb.png"),
+            "*": load_image("explosion.png")
         }
 
     def render(self, matrix):
@@ -43,7 +44,9 @@ class MapRendererTkinter:
 
         self.canvas.create_image(x, y, anchor="nw", image=self.images["!"], tags=f"cell_{row}_{col}")
 
-        if symbol != " ":
+        if symbol != "!":
             image = self.images.get(symbol)
             if image:
-                self.canvas.create_image(x, y, anchor="nw", image=image, tags=f"cell_{row}_{col}")   
+                self.canvas.create_image(x, y, anchor="nw", image=image, tags=f"cell_{row}_{col}")
+            else:
+                print(f"Aviso: Símbolo '{symbol}' não encontrado no dicionário de imagens!")
