@@ -1,5 +1,5 @@
 import random
-from model.Helper import OBSTACLE_DESTR, OBSTACLE_INDESTR, BOMB_SYMBOL, PLAYER_SYMBOL
+from model.Helper import OBSTACLE_DESTR, OBSTACLE_INDESTR, BOMB_SYMBOL, PLAYER_SYMBOL, FLOOR_SYMBOL
 
 class Enemy:
     """
@@ -31,7 +31,6 @@ class Enemy:
         return False
 
     def move(self, game_map):
-        from model.Map import Map
         player_hit = False
         old_row, old_col = self.current_position
 
@@ -49,7 +48,10 @@ class Enemy:
             self.current_position = (new_row, new_col)
             return player_hit
         
-        game_map.update_cell(old_row, old_col, Map.EMPTY)
+        game_map.matrix[old_row][old_col] = FLOOR_SYMBOL
+        game_map.matrix[new_row][new_col] = Enemy.SYMBOL
+
+        game_map.update_cell(old_row, old_col, FLOOR_SYMBOL)
         game_map.update_cell(new_row, new_col, Enemy.SYMBOL)
         self.current_position = (new_row, new_col)
 
