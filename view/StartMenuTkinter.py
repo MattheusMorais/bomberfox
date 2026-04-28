@@ -1,5 +1,6 @@
 from tkinter import *
 from pathlib import Path
+from PIL import Image, ImageTk
 
 class StartMenuTkinter:
 
@@ -13,96 +14,67 @@ class StartMenuTkinter:
         self.show_welcome()
 
     def show_welcome(self):
-        
-        self.background_path = self.BASE_DIR / "startMenu_bg.png"
-        self.background_image = PhotoImage(file=self.background_path).subsample(4,4)
-
+        self.background_path = self.BASE_DIR / "startMenu_bg1.png"
+        self.background_image = PhotoImage(file=self.background_path)
         self.canvas.create_image(0, 0, image=self.background_image, anchor=NW)
 
-        self.canvas.create_text(400, 80, text="BOMBERBOY", font=("Arial", 40), fill="white")
-
         if self.game_state.get_rounds_played() > 0:
-            self.mid_box_path = self.BASE_DIR / "mid_box.png"
-            self.mid_box_image = PhotoImage(file=self.mid_box_path).subsample(3,3)
-            
-            self.canvas.create_image(403, 380, image=self.mid_box_image, tags="mid_box")
-            self.canvas.create_text(400, 150, 
-                            text="ESTATÍSTICAS DA ÚLTIMA SESSÃO", 
-                            tags="mid_box",
-                            font=("Arial", 16, "bold"),
-                            fill="white"
-                            )
-            self.canvas.create_text(215, 290,
-                            text="PARTIDAS", 
-                            font=("Arial", 18), 
-                            tags="mid_box",
-                            fill="white"
-                            )
-            self.canvas.create_text(215, 310, 
-                            text="JOGADAS", 
-                            font=("Arial", 18), 
-                            tags="mid_box",
-                            fill="white"
-                            )
+            self.stats_path = self.BASE_DIR / "stats.png"
+            self.stats_image = Image.open(self.stats_path).resize((400,650), Image.Resampling.NEAREST)
+
+            alpha = self.stats_image.getchannel("A")
+            alpha = alpha.point(lambda p: int(p * 0.90))
+            self.stats_image.putalpha(alpha)
+
+            self.stats_image = ImageTk.PhotoImage(self.stats_image)
+            self.canvas.create_image(230, 380, image=self.stats_image, tags="stats")
+
+            self.rounds_played_path = self.BASE_DIR / "rounds_played.png"
+            self.rounds_played_image = Image.open(self.rounds_played_path).resize((200,100), Image.Resampling.NEAREST)
+            self.rounds_played_image = ImageTk.PhotoImage(self.rounds_played_image)
+            self.canvas.create_image(230,170, image=self.rounds_played_image, tags="stats")
             self.canvas.create_text(
-                220, 350, #350
+                230, 250, #350
                 text=f"{self.game_state.get_rounds_played()}",
                 font=("Arial", 35, "bold"),
                 fill="#ecce32"
             )
-            self.canvas.create_text(405, 290, 
-                            text="ÚLTIMA",
-                            tags="mid_box",
-                            font=("Arial", 18), 
-                            fill="white"
-                            )
-            self.canvas.create_text(405, 310, 
-                            text="ELIMINAÇÃO",
-                            tags="mid_box",
-                            font=("Arial", 18), 
-                            fill="white"
-                            )
+
+            self.gameover_cause_path = self.BASE_DIR / "sem_titulo1.png"
+            self.gameover_cause_image = Image.open(self.gameover_cause_path).resize((250,100), Image.Resampling.NEAREST)
+            self.gameover_cause_image = ImageTk.PhotoImage(self.gameover_cause_image)   
+            self.canvas.create_image(230,350, image=self.gameover_cause_image, tags="stats")         
             self.canvas.create_text(
-                405, 350,
+                230, 430,
                 text=f"{self.game_state.get_game_over_cause()}",
-                tags="mid_box",
-                font=("Arial", 20, "bold"),
+                tags="stats",
+                font=("Arial", 40, "bold"),
                 fill="#ecce32"
             )
-            self.canvas.create_text(595, 290, 
-                            text="INIMIGOS",
-                            tags="mid_box",
-                            font=("Arial", 18), 
-                            fill="white"
-                            )
-            self.canvas.create_text(595, 310, 
-                            text="ELIMINADOS",
-                            tags="mid_box",
-                            font=("Arial", 18), 
-                            fill="white"
-                            )
+
+            self.killed_enemies_path = self.BASE_DIR / "killed_enemies.png"
+            self.killed_enemies_image = Image.open(self.killed_enemies_path).resize((250,100), Image.Resampling.NEAREST)
+            self.killed_enemies_image = ImageTk.PhotoImage(self.killed_enemies_image)
+            self.canvas.create_image(230,540, image=self.killed_enemies_image, tags="stats")         
+
             self.canvas.create_text(
-                595, 350,
+                230, 630,
                 text=f"{self.game_state.get_killed_enemies()}",
-                tags="mid_box",
-                font=("Arial", 35, "bold"),
+                tags="stats",
+                font=("Arial", 40, "bold"),
                 fill="#ecce32"
             )
 
             self.play_button()
 
-        else:
-            self.canvas.create_text(400,400,text="\nPrimeira partida! Boa sorte.\n", font=("Arial",40), fill="white")
-            self.play_button()
-    
     def on_play_click(self, event=None):
         self.canvas.destroy()
         self.start_game()
 
     def play_button(self):
         self.play_button_path = self.BASE_DIR / "play_button.png"
-        self.play_button_image = PhotoImage(file=self.play_button_path).subsample(5,5)
-        
-        self.button = self.canvas.create_image(400, 680, image=self.play_button_image, tags="play")
+        self.play_button_image = Image.open(self.play_button_path).resize((250,200), Image.Resampling.NEAREST)
+        self.play_button_image = ImageTk.PhotoImage(self.play_button_image)
+        self.button = self.canvas.create_image(1120, 370, image=self.play_button_image, tags="play")
         self.canvas.tag_bind(self.button, "<Button-1>", self.on_play_click)
         
