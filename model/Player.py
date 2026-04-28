@@ -1,5 +1,5 @@
 from model.Bomb import Bomb
-from model.Helper import MAP_EMPTY, ENEMY_SYMBOL, OBSTACLE_DESTR, OBSTACLE_INDESTR, BOMB_SYMBOL
+from model.Helper import ENEMY_SYMBOL, OBSTACLE_DESTR, OBSTACLE_INDESTR, BOMB_SYMBOL, FLOOR_SYMBOL
 
 class Player:
     """
@@ -29,12 +29,15 @@ class Player:
         self.current_position = self.spawn_position
         self.game_state = game_state
         self.player_alive = True
-        
+        self.moved = False
+
     def move(self, move_command, game_map):
         if self.is_blocked(move_command, game_map):
             return False
             
         if move_command in self.directions:
+            self.moved = True
+
             old_row, old_col = self.current_position
             drow, dcol = self.directions[move_command]
 
@@ -47,7 +50,7 @@ class Player:
             if old_cell == Bomb.SYMBOL:
                 game_map.update_cell(old_row, old_col, Bomb.SYMBOL)
             else:
-                game_map.update_cell(old_row, old_col, MAP_EMPTY)
+                game_map.update_cell(old_row, old_col, FLOOR_SYMBOL)
 
             if new_cell == Bomb.SYMBOL:
                 game_map.update_cell(new_row, new_col, Bomb.SYMBOL)
