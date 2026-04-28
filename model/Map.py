@@ -1,5 +1,5 @@
 import random
-from model.Helper import ENEMY_SYMBOL
+from model.Helper import ENEMY_SYMBOL, FLOOR_SYMBOL, EXPLOSION_SYMBOL
 from model.Obstacles import Obstacles
 from model.Player import Player
 from model.Bomb import Bomb
@@ -9,20 +9,17 @@ class Map:
     Representa o mapa do jogo, contendo o jogador, inimigos, obstáculos e suas interações.
 
     Attributes:
-        EMPTY (str): Símbolo que representa célula vazia.
         game_state: Objeto que mantém o estado do jogo.
         size (int): Dimensão do mapa (matriz quadrada).
         player_row (int): Linha da posição inicial do jogador.
         player_col (int): Coluna da posição inicial do jogador.
-        initial_number_of_enemies (int): Quantidade inicial de inimigos no jogo.
+        initial_number_of_enemies (int): Quantidade iniscial de inimigos no jogo.
         enemy_quantity (int): Quantidade total de inimigos no mapa.
         obstacles (list): Lista de obstáculos no mapa (instância + posição).
         num_obstacles (int): Número de obstáculos a serem criados.
         min_distance_from_border (int): Distância mínima entre obstáculos/jogador e bordas.
         matrix (list): Representação 2D do mapa.
     """
-
-    EMPTY = " "
 
     def __init__(self, game_state):
         self.game_state = game_state
@@ -38,7 +35,7 @@ class Map:
         self.create_map()
 
     def create_map(self):
-        self.matrix = [[self.EMPTY for _ in range(self.size)] for _ in range(self.size)]
+        self.matrix = [[FLOOR_SYMBOL for _ in range(self.size)] for _ in range(self.size)]
 
         # Cria paredes indestrutiveis para delimitar o mapa
         for i in range(self.size):
@@ -51,7 +48,7 @@ class Map:
             row = random.randint(1, self.size - 2)  
             col = random.randint(1, self.size - 2)
 
-            if self.matrix[row][col] == self.EMPTY:
+            if self.matrix[row][col] == FLOOR_SYMBOL:
                 if abs(row - self.player_row) + abs(col - self.player_col) >= self.min_distance_from_border:
 
                     obstacle = Obstacles(self.game_state)
@@ -75,7 +72,7 @@ class Map:
 
         for i, row in enumerate(self.matrix):
             for j, cell in enumerate(row):
-                if cell == self.EMPTY:  
+                if cell == FLOOR_SYMBOL:  
                     if abs(i - self.player_row) + abs(j - self.player_col) >= min_distance_from_player:
                         free_positions.append((i, j))
         return free_positions
@@ -85,10 +82,20 @@ class Map:
             
     def update_cell(self, row, col, symbol):
         if self.is_index_valid(row, col):
+            self.matrix[row][col] = symbol
             self.renderer.draw(row, col, symbol)
         else:
             print(f"Tentativa de atualizar célula inválida: ({row},{col})")
-            
+    
+    def restore_cells(self, original_cells):
+        for (row, col), original_cell in original_cells.items():
+            if original_cell == Obstacles.DESTR:
+                self.update_cell(row, col, FLOOR_SYMBOL)
+            elif original_cell in [ENEMY_SYMBOL, Player.SYMBOL, Bomb.SYMBOL]:
+                self.update_cell(row, col, FLOOR_SYMBOL)
+            else:
+                self.update_cell(row, col, original_cell)
+
     def chain_explosion(self, bomb, player_1, enemies):
         explosion_tiles = bomb.get_explosion_tiles()
         original_cells = {}
@@ -101,22 +108,13 @@ class Map:
 
             if cell == Obstacles.INDESTR:
                 continue
-                
+                    
             original_cells[(row, col)] = cell
-            self.update_cell(row, col, "*")
+            self.update_cell(row, col, EXPLOSION_SYMBOL)
 
         hit_enemies = []
         player_hit = False
         for (row, col), original_cell in original_cells.items():
-            if original_cell == Obstacles.DESTR:
-                self.update_cell(row, col, self.EMPTY)
-            elif original_cell == ENEMY_SYMBOL or original_cell == Player.SYMBOL:
-                self.update_cell(row, col, self.EMPTY)
-            elif original_cell == Bomb.SYMBOL:
-                self.update_cell(row, col, self.EMPTY)
-            else:
-                self.update_cell(row, col, original_cell)
-        
             for enemy in enemies:
                 if enemy.current_position == (row, col):
                     hit_enemies.append(enemy)
@@ -124,8 +122,9 @@ class Map:
             if player_1.current_position == (row, col):
                 player_hit = True
 
+        self.renderer.canvas.after(1000, self.restore_cells, original_cells)
         return hit_enemies, player_hit
     
     def set_renderer(self, renderer):
         self.renderer = renderer
-        
+    
