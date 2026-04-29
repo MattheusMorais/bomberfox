@@ -4,18 +4,26 @@ view package
 Submodules
 ----------
 
-view.GameOver module
---------------------
+view.GameOverTkinter module
+---------------------------
 
-.. automodule:: view.GameOver
+.. automodule:: view.GameOverTkinter
    :members:
    :show-inheritance:
    :undoc-members:
 
-view.StartMenu module
----------------------
+view.MapRendererTkinter module
+------------------------------
 
-.. automodule:: view.StartMenu
+.. automodule:: view.MapRendererTkinter
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+view.StartMenuTkinter module
+----------------------------
+
+.. automodule:: view.StartMenuTkinter
    :members:
    :show-inheritance:
    :undoc-members:

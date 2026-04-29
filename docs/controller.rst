@@ -4,6 +4,14 @@ controller package
 Submodules
 ----------
 
+controller.GameOver module
+--------------------------
+
+.. automodule:: controller.GameOver
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 controller.Gameplay module
 --------------------------
 
