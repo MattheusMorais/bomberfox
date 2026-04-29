@@ -258,7 +258,7 @@ class Gameplay:
         return self.game_over_canvas
 
     def player_survived(self):
-        self.game_state.set_game_over_cause(GameOver.cause_SUCCESS)
+        self.game_state.set_game_over_cause(GameOver.CAUSE_SUCCESS)
 
         game_over_cause = self.game_state.get_game_over_cause()
         game_over_turn = self.game_state.get_survived_turns()
@@ -268,7 +268,7 @@ class Gameplay:
         GameOver(game_over_cause, game_over_turn, self.create_game_over_canvas())
 
     def player_killed_by_enemy(self):
-        self.game_state.set_game_over_cause(GameOver.cause_ENEMY)
+        self.game_state.set_game_over_cause(GameOver.CAUSE_ENEMY)
         self.game_state.set_game_over_turn(self.game_state.get_survived_turns())
         self.player_1.player_alive = False
 
@@ -280,7 +280,7 @@ class Gameplay:
         GameOver(game_over_cause, game_over_turn, self.create_game_over_canvas())
         
     def player_dead_by_explosion(self):
-        self.game_state.set_game_over_cause(GameOver.cause_EXPLOSION)
+        self.game_state.set_game_over_cause(GameOver.CAUSE_EXPLOSION)
         self.game_state.set_game_over_turn(self.game_state.get_survived_turns())
         self.player_1.player_alive = False
 

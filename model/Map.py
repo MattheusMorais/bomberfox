@@ -26,7 +26,7 @@ class Map:
         self.renderer = None
         self.matrix = None
         self.size = 12
-        self.player_row, self.player_col = Player.spawn_position
+        self.player_row, self.player_col = Player.SPAWN_POSITION
         self.initial_number_of_enemies = game_state.get_enemy_start()
         self.enemy_quantity = game_state.get_enemy_quantity()
         self.obstacles = []
@@ -61,7 +61,7 @@ class Map:
                     self.obstacles.append((obstacle, row, col))
 
         # Coloca o jogador no mapa
-        row, col = Player.spawn_position
+        row, col = Player.SPAWN_POSITION
         self.matrix[row][col] = Player.SYMBOL
 
         return self.matrix
