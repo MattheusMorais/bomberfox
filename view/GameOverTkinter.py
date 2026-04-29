@@ -11,7 +11,7 @@ class GameOverTkinter:
         self.game_over_cause = game_over_cause
         self.game_over_turn = game_over_turn
         self.game_over_canvas = game_over_canvas
-        self.BASE_DIR = Path.cwd() / "assets" / "GameOver"
+        self.BASE_DIR = Path(__file__).resolve().parent.parent / "assets" / "GameOver"
 
         w = self.game_over_canvas.winfo_width()
         h = self.game_over_canvas.winfo_height()

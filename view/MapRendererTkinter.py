@@ -13,7 +13,7 @@ class MapRendererTkinter:
         self.game_state = game_state
         self.restart_callback = restart_callback
         self.tile_size = tile_size
-        self.BASE_DIR = Path.cwd() / "assets" / "Map"
+        self.BASE_DIR = Path(__file__).resolve().parent.parent / "assets" / "Map"
 
         def load_map_image(image_name):
             img = Image.open(self.BASE_DIR / image_name)

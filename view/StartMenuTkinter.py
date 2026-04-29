@@ -11,7 +11,7 @@ class StartMenuTkinter:
         self.game_frame = game_frame
         self.game_state = game_state
         self.start_game = start_game
-        self.BASE_DIR = Path.cwd() / "assets" / "StartMenu"
+        self.BASE_DIR = Path(__file__).resolve().parent.parent / "assets" / "StartMenu"
         
         self.startMenu_canvas = Canvas(self.game_frame, highlightthickness=0)
         self.startMenu_canvas.pack(fill="both", expand=True)
