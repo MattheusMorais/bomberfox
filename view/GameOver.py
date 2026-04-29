@@ -1,3 +1,6 @@
+from view.GameOverTkinter import GameOverTkinter
+
+
 class GameOver:
     # """ 
     # Exibe a tela de Game Over do jogo, mostrando a causa da morte ou sucesso e o turno em que ocorreu.
@@ -14,7 +17,9 @@ class GameOver:
     cause_ENEMY = "Inimigo"
     cause_SUCCESS = "Sobreviveu!"
 
-    def __init__(self, game_over_cause, game_over_turn):
+    def __init__(self, game_over_cause, game_over_turn, game_over_canva):
         self.game_over_cause = game_over_cause
         self.game_over_turn = game_over_turn
+        self.game_over_canva = game_over_canva
+        GameOverTkinter(game_over_cause, game_over_turn, game_over_canva)
         
