@@ -4,9 +4,9 @@ from PIL import Image, ImageTk
 
 class StartMenuTkinter:
     """
-    Motor de renderização visual para o mapa e interface lateral (HUD).
+    Gerencia a interface do menu inicial, exibindo estatísticas e o botão de início.
     """
-    
+
     def __init__(self, game_state, game_frame, start_game):
         self.game_frame = game_frame
         self.game_state = game_state
@@ -88,3 +88,4 @@ class StartMenuTkinter:
         self.play_button_image = ImageTk.PhotoImage(self.play_button_image)
         self.button = self.startMenu_canvas.create_image(self.w - 400, self.h // 2, image=self.play_button_image, tags="play")
         self.startMenu_canvas.tag_bind(self.button, "<Button-1>", self.on_play_click)
+        

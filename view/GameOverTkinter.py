@@ -57,6 +57,5 @@ class GameOverTkinter:
         def on_restart_click(event):
             os.execl(sys.executable, sys.executable, *sys.argv)
         
-
         self.restart_button = self.game_over_canvas.create_image(670, 920, image=self.images["restart_button"], tags="game_over")
         self.game_over_canvas.tag_bind(self.restart_button, "<Button-1>", on_restart_click)

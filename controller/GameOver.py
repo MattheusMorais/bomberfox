@@ -1,6 +1,5 @@
 from view.GameOverTkinter import GameOverTkinter
 
-
 class GameOver:
     """ 
     Exibe a tela de fim de jogo, gerenciando a causa e o turno final.   

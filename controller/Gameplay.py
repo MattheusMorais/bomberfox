@@ -7,7 +7,7 @@ from model.Map import Map
 from model.Obstacles import Obstacles
 from model.Player import Player
 from service.GameState import GameState
-from view.GameOver import GameOver
+from controller.GameOver import GameOver
 from view.StartMenuTkinter import StartMenuTkinter
 from view.MapRendererTkinter import MapRendererTkinter
 

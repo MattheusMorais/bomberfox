@@ -161,9 +161,6 @@ class GameState:
         except FileNotFoundError:
             print("Erro ao abrir arquivo! Arquivo não existe.")
         
-        # for key, value in self.config.items(): # Debug
-        #     print(key," : ", value)
-
     def save(self):
         configs = {
             "roundsPlayed" : self.rounds_played,

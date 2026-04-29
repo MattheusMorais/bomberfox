@@ -6,8 +6,8 @@ from model.Bomb import Bomb
 
 class Map:
     """
-    Representa o mapa do jogo, contendo o jogador, inimigos, obstáculos e suas interações.
-
+    Gerencia a matriz do jogo, colisões de explosão e spawn de entidades.
+    
     Attributes:
         game_state: Objeto que mantém o estado do jogo.
         size (int): Dimensão do mapa (matriz quadrada).
