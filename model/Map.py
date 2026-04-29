@@ -122,7 +122,7 @@ class Map:
             if player_1.current_position == (row, col):
                 player_hit = True
 
-        self.renderer.canvas.after(1000, self.restore_cells, original_cells)
+        self.renderer.map_canvas.after(1000, lambda: self.restore_cells(original_cells))        
         return hit_enemies, player_hit
     
     def set_renderer(self, renderer):
