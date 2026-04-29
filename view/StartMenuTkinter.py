@@ -42,7 +42,7 @@ class StartMenuTkinter:
             self.startMenu_canvas.create_image(330, 230, image=self.rounds_played_image, tags="stats")
             
             self.startMenu_canvas.create_text(
-                330, 300,
+                330, 330,
                 text=f"{self.game_state.get_rounds_played()}",
                 font=("Arial", 35, "bold"),
                 fill="#ecce32", tags="stats"
