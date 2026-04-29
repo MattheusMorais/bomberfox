@@ -3,9 +3,11 @@ from pathlib import Path
 from PIL import Image, ImageTk
 
 class MapRendererTkinter:
+    """
+    Motor de renderização visual para o mapa e interface lateral (HUD).
+    """
 
     def __init__(self, map_canvas, hud_canvas, restart_callback, game_state, tile_size=48):
-        self.tiles = []
         self.map_canvas = map_canvas
         self.hud_canvas = hud_canvas
         self.game_state = game_state
@@ -70,7 +72,6 @@ class MapRendererTkinter:
         self.update_hud_values()
 
     def update_cell(self, row, col, symbol):
-        self.map_canvas.delete(f"cell_{row}_{col}")
         self.draw(row, col, symbol)
 
     def draw(self, row, col, symbol):
@@ -85,7 +86,3 @@ class MapRendererTkinter:
             image = self.images.get(symbol)
             if image:
                 self.map_canvas.create_image(x, y, anchor="nw", image=image, tags=f"cell_{row}_{col}")
-            else:
-                print(f"Aviso: Símbolo '{symbol}' não encontrado no dicionário de imagens!")
-
-    

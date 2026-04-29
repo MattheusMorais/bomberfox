@@ -7,8 +7,8 @@ class Player:
 
     Attributes:
         SYMBOL (str): Símbolo que representa o jogador no mapa.
-        spawn_position (tuple[int, int]): Posição inicial do jogador no mapa.
-        directions (dict[str, tuple[int, int]]): Dicionário para mudança de posição.
+        SPAWN_POSITION (tuple[int, int]): Posição inicial do jogador no mapa.
+        DIRECTIONS (dict[str, tuple[int, int]]): Dicionário para mudança de posição.
         active_bombs (list[Bomb]): Lista de bombas ativas colocadas pelo jogador.
         current_position (tuple[int, int]): Posição atual do jogador.
         game_state (GameState): variavel para acessar o estado do jogo.
@@ -16,8 +16,8 @@ class Player:
     """   
 
     SYMBOL = "P"
-    spawn_position = (1,1)
-    directions = {
+    SPAWN_POSITION = (1,1)
+    DIRECTIONS = {
         "w" : (-1,0),
         "a" : (0,-1),
         "s" : (1,0),
@@ -26,7 +26,7 @@ class Player:
 
     def __init__(self, game_state):
         self.active_bombs = []
-        self.current_position = self.spawn_position
+        self.current_position = self.SPAWN_POSITION
         self.game_state = game_state
         self.player_alive = True
         self.moved = False
@@ -35,11 +35,11 @@ class Player:
         if self.is_blocked(move_command, game_map):
             return False
             
-        if move_command in self.directions:
+        if move_command in self.DIRECTIONS:
             self.moved = True
 
             old_row, old_col = self.current_position
-            drow, dcol = self.directions[move_command]
+            drow, dcol = self.DIRECTIONS[move_command]
 
             new_row = old_row + drow
             new_col = old_col + dcol
@@ -78,8 +78,8 @@ class Player:
     def is_blocked(self, move_command, game_map):
         row, col = self.current_position
 
-        if move_command in self.directions:
-            drow, dcol = self.directions[move_command]
+        if move_command in self.DIRECTIONS:
+            drow, dcol = self.DIRECTIONS[move_command]
 
             new_row = row + drow
             new_col = col + dcol

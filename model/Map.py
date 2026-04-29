@@ -13,7 +13,7 @@ class Map:
         size (int): Dimensão do mapa (matriz quadrada).
         player_row (int): Linha da posição inicial do jogador.
         player_col (int): Coluna da posição inicial do jogador.
-        initial_number_of_enemies (int): Quantidade iniscial de inimigos no jogo.
+        initial_number_of_enemies (int): Quantidade inicial de inimigos no jogo.
         enemy_quantity (int): Quantidade total de inimigos no mapa.
         obstacles (list): Lista de obstáculos no mapa (instância + posição).
         num_obstacles (int): Número de obstáculos a serem criados.

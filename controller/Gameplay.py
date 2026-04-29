@@ -18,7 +18,7 @@ class Gameplay:
 
     Attributes:
         game_state (GameState): Instância que mantém o estado do jogo.
-        start_menu (StartMenu): Menu inicial com estatísticas anteriores.
+        start_menu (StartMenuTkinter): Menu inicial com estatísticas anteriores.
         enemies_killed (int): Contador de inimigos eliminados na partida atual.
         initial_number_of_enemies (int): Número de inimigos ao iniciar a partida.
         enemies (list): Lista de inimigos ativos no mapa.
@@ -40,7 +40,6 @@ class Gameplay:
             "move_right": self.window.bind("<d>",lambda event: self.player_1.move('d', self.start_game_map)),
             "quit": self.window.bind("<q>", lambda event: self.close_game()),
             "put_bomb": self.window.bind("<f>",lambda event: self.player_1.put_bomb('f', self.start_game_map)),
-            "move_up": self.window.bind("<w>",lambda event: self.player_1.move('w', self.start_game_map))
         }
 
         self.start_menu = StartMenuTkinter(
@@ -60,9 +59,7 @@ class Gameplay:
 
     def setup_map(self):
         """Inicializa o mapa, canvas e renderer."""
-
         self.start_game_map = Map(self.game_state)
-
         self.free_positions = self.start_game_map.get_free_positions()
 
         container = Frame(self.game_frame, bg="#000000")
@@ -79,16 +76,13 @@ class Gameplay:
         self.start_game_map.set_renderer(self.renderer)
  
         self.player_1 = Player(self.game_state)
- 
-        obstacle = Obstacles(self.game_state)
- 
+        Obstacles(self.game_state)
         self.create_start_enemies()
 
         self.renderer.render(self.start_game_map.matrix)
 
     def game_loop(self):
         if self.player_1.is_alive() and self.game_state.get_game_over_cause() == "None":
-
             if self.player_1.moved:
                 self.update_bombs()
                 self.create_dynamic_enemies()
@@ -110,13 +104,14 @@ class Gameplay:
                     
                 self.player_survived()
                 self.game_state.save() 
+
     def close_game(self):
         self.window.destroy()
 
     def lower_difficulty(self):
         self.lower_difficulty_to_easy()
         self.game_state.save()
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        os.execl(sys.executable, sys.executable, *sys.argv) # Reinicia o jogo para aplicar as mudanças de dificuldade
 
     def create_start_enemies(self):
         for _ in range(self.initial_number_of_enemies):
@@ -241,7 +236,6 @@ class Gameplay:
         for bomb in self.player_1.active_bombs[:]:
             if bomb.tick():
                 hit_enemies, player_hit = self.start_game_map.chain_explosion(bomb, self.player_1, self.enemies)
-                print("***** EXPLOSÃO EM CADEIA ACIMA ***** ")
                 self.player_1.active_bombs.remove(bomb)
 
             if player_hit: # Fim do jogo
@@ -258,7 +252,7 @@ class Gameplay:
                 
         self.renderer.render(self.start_game_map.matrix)
 
-    def create_game_over_canva(self):  
+    def create_game_over_canvas(self):  
         self.game_over_canvas = Canvas(self.window, bg="#000000", highlightthickness=0)
         self.game_over_canvas.pack(fill="both", expand=True)
         return self.game_over_canvas
@@ -271,7 +265,7 @@ class Gameplay:
         self.game_state.save()
 
         self.game_frame.destroy()
-        GameOver(game_over_cause, game_over_turn, self.create_game_over_canva())
+        GameOver(game_over_cause, game_over_turn, self.create_game_over_canvas())
 
     def player_killed_by_enemy(self):
         self.game_state.set_game_over_cause(GameOver.cause_ENEMY)
@@ -283,7 +277,7 @@ class Gameplay:
         self.game_state.save()
 
         self.game_frame.destroy()
-        GameOver(game_over_cause, game_over_turn, self.create_game_over_canva())
+        GameOver(game_over_cause, game_over_turn, self.create_game_over_canvas())
         
     def player_dead_by_explosion(self):
         self.game_state.set_game_over_cause(GameOver.cause_EXPLOSION)
@@ -295,7 +289,7 @@ class Gameplay:
         self.game_state.save()
 
         self.game_frame.destroy()
-        GameOver(game_over_cause, game_over_turn, self.create_game_over_canva())
+        GameOver(game_over_cause, game_over_turn, self.create_game_over_canvas())
         
     def update_enemies_quantity(self, hit_enemies):
         for enemy in self.enemies[:]: 
@@ -308,6 +302,5 @@ class Gameplay:
         self.game_state.set_killed_enemies(self.enemies_killed)
 
     def start_game(self):
-        print("START_GAME FOI CHAMADO")
         self.setup_map()
         self.game_loop()

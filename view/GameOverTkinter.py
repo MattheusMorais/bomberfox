@@ -1,4 +1,3 @@
-from curses import window
 import os
 import sys
 from tkinter import *
@@ -6,6 +5,7 @@ from PIL import Image, ImageTk
 from pathlib import Path
 
 class GameOverTkinter:
+    """Interface visual do Game Over utilizando Tkinter e PIL."""
 
     def __init__(self, game_over_cause, game_over_turn, game_over_canvas):
         self.game_over_cause = game_over_cause
