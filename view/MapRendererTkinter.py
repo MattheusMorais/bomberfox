@@ -86,3 +86,4 @@ class MapRendererTkinter:
             image = self.images.get(symbol)
             if image:
                 self.map_canvas.create_image(x, y, anchor="nw", image=image, tags=f"cell_{row}_{col}")
+                

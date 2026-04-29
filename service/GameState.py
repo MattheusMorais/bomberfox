@@ -182,3 +182,4 @@ class GameState:
 
         with open(self.config_path, "w") as file:
             json.dump(configs, file, indent=4)
+            
