@@ -27,8 +27,9 @@ class Gameplay:
         player_1: Instância do jogador.
     """
 
-    def __init__(self, window):
-        self.window = window
+    def __init__(self, game_frame):
+        self.game_frame = game_frame
+        self.window = game_frame.winfo_toplevel()
         self.game_state = GameState()
         self.game_state.open()
 
@@ -44,7 +45,7 @@ class Gameplay:
 
         self.start_menu = StartMenuTkinter(
             self.game_state,
-            window,
+            self.game_frame,
             self.start_game
         )
  
@@ -54,23 +55,27 @@ class Gameplay:
         self.game_state.set_game_over_cause("None")
         self.enemies = []
  
-        self.canvas = None
+        self.map_canvas = None
         self.renderer = None
-
-        # lower_diff = Canvas.create_rectangle(self.canvas)
-        lower_diff = Button(self.window, text="Abaixar Dificuldade", command=self.lower_difficulty)
-        lower_diff.pack()
 
     def setup_map(self):
         """Inicializa o mapa, canvas e renderer."""
+
         self.start_game_map = Map(self.game_state)
 
         self.free_positions = self.start_game_map.get_free_positions()
 
-        size = self.start_game_map.size * 48
-        self.canvas = Canvas(self.window, width=size, height=size, bg="#653c08")
-        self.canvas.pack()
-        self.renderer = MapRendererTkinter(self.canvas)
+        container = Frame(self.game_frame, bg="#000000")
+        container.pack(expand=True)
+
+        map_size = self.start_game_map.size * 48
+        self.map_canvas = Canvas(container, width=map_size, height=map_size, bg="#653c08", highlightthickness=0)
+        self.map_canvas.grid(row=0, column=0, sticky="nsew")
+
+        self.hud_canvas = Canvas(container, width=300, height=map_size, bg="#2c3e50", highlightthickness=0)
+        self.hud_canvas.grid(row=0, column=1, sticky="nsew")
+
+        self.renderer = MapRendererTkinter(self.map_canvas, self.hud_canvas, self.lower_difficulty, self.game_state)
         self.start_game_map.set_renderer(self.renderer)
  
         self.player_1 = Player(self.game_state)
@@ -81,19 +86,7 @@ class Gameplay:
 
         self.renderer.render(self.start_game_map.matrix)
 
-
     def game_loop(self):
-        # print(f"Movimento: w/a/s/d        "
-            #       f"Colocar bomba: f        "
-            #       f"Sair: q        "
-            #       f"Bombas utilizadas: {self.game_state.get_bombs_utilized()}        "
-            #       f"Inimigos vivo: {self.game_state.get_enemy_quantity()}        "
-            #       f"Turnos sobrevividos: {self.game_state.get_survived_turns()}        "
-            #       f"Turno maximo: {self.game_state.get_maximum_turn()}\n"
-            #       f"Dificuldade atual: {self.game_state.get_difficulty()}   "
-            #       f"Inimigos mortos: {self.enemies_killed}       "
-            #       )
-
         if self.player_1.is_alive() and self.game_state.get_game_over_cause() == "None":
 
             if self.player_1.moved:
@@ -104,7 +97,7 @@ class Gameplay:
                 self.renderer.render(self.start_game_map.matrix)
                 self.player_1.moved = False
             
-            self.window.after(100, self.game_loop)
+            self.game_frame.after(100, self.game_loop)
 
             if not self.player_1.is_alive():
                 self.update_rounds_played()
@@ -117,17 +110,13 @@ class Gameplay:
                     
                 self.player_survived()
                 self.game_state.save() 
-            
+    def close_game(self):
+        self.window.destroy()
+
     def lower_difficulty(self):
         self.lower_difficulty_to_easy()
         self.game_state.save()
-                # print("")
-                # print("Dificuldade alterada para fácil. Reiniciando o jogo...\n")
-        self.close_game()
         os.execl(sys.executable, sys.executable, *sys.argv)
-
-    def close_game(self):
-        self.window.destroy()
 
     def create_start_enemies(self):
         for _ in range(self.initial_number_of_enemies):
@@ -170,7 +159,6 @@ class Gameplay:
         self.game_state.set_rounds_survived(rounds_survived+1)
         
     def update_difficulty(self):
-
         if self.game_state.get_rounds_survived() >= 6:
             self.game_state.set_difficulty("hard")
 
@@ -269,15 +257,22 @@ class Gameplay:
                 self.player_1.player_alive = False
                 
         self.renderer.render(self.start_game_map.matrix)
-        
+
+    def create_game_over_canva(self):  
+        self.game_over_canvas = Canvas(self.window, bg="#000000", highlightthickness=0)
+        self.game_over_canvas.pack(fill="both", expand=True)
+        return self.game_over_canvas
+
     def player_survived(self):
         self.game_state.set_game_over_cause(GameOver.cause_SUCCESS)
 
         game_over_cause = self.game_state.get_game_over_cause()
         game_over_turn = self.game_state.get_survived_turns()
+        self.game_state.save()
 
-        GameOver(game_over_cause, game_over_turn)
-    
+        self.game_frame.destroy()
+        GameOver(game_over_cause, game_over_turn, self.create_game_over_canva())
+
     def player_killed_by_enemy(self):
         self.game_state.set_game_over_cause(GameOver.cause_ENEMY)
         self.game_state.set_game_over_turn(self.game_state.get_survived_turns())
@@ -285,9 +280,11 @@ class Gameplay:
 
         game_over_cause = self.game_state.get_game_over_cause()
         game_over_turn = self.game_state.get_game_over_turn()
+        self.game_state.save()
 
-        GameOver(game_over_cause, game_over_turn)
-    
+        self.game_frame.destroy()
+        GameOver(game_over_cause, game_over_turn, self.create_game_over_canva())
+        
     def player_dead_by_explosion(self):
         self.game_state.set_game_over_cause(GameOver.cause_EXPLOSION)
         self.game_state.set_game_over_turn(self.game_state.get_survived_turns())
@@ -295,9 +292,11 @@ class Gameplay:
 
         game_over_cause = self.game_state.get_game_over_cause()
         game_over_turn = self.game_state.get_game_over_turn()
+        self.game_state.save()
 
-        GameOver(game_over_cause, game_over_turn)
-
+        self.game_frame.destroy()
+        GameOver(game_over_cause, game_over_turn, self.create_game_over_canva())
+        
     def update_enemies_quantity(self, hit_enemies):
         for enemy in self.enemies[:]: 
                 if enemy in hit_enemies:
