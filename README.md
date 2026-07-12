@@ -50,7 +50,7 @@ Durante o desenvolvimento foram aplicados conceitos como:
 
 <div align="center">
 
-<img src="images/gameplay.png" width="70%">
+<img src="assets/Map/gameplay.png" width="70%">
 
 </div>
 
